@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() &&
+        request.auth.uid == userId &&
+        request.resource.data.email == request.auth.token.email &&
+        request.resource.data.role == 'user';
+      allow update: if isSignedIn() &&
+        (request.auth.uid == userId || isAdmin()) &&
+        (
+          isAdmin() ||
+          request.resource.data.role == resource.data.role
+        );
+    }
+
+    match /courses/{courseId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /purchases/{purchaseId} {
+      allow read: if isSignedIn() &&
+        (
+          resource.data.userId == request.auth.uid ||
+          isAdmin()
+        );
+      allow create: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.courseId is string;
+      allow update, delete: if false;
+    }
+  }
+}
