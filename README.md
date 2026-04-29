@@ -1,6 +1,6 @@
 # 🖥️ Whizz Computer — Premium Frontend
 
-> Awwwards-level redesign of [whizzcomputer.com](https://whizzcomputer.com) built with React + Vite + GSAP + Framer Motion + Lenis + Tailwind CSS.
+> Awwwards-level redesign of built with React + Vite + GSAP + Framer Motion + Lenis + Tailwind CSS.
 
 ---
 
